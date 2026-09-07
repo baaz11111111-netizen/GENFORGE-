@@ -72,7 +72,7 @@ GENFORGE is a Streamlit-based application that combines FFmpeg editing pipelines
 
 5. **Run the application**
    ```bash
-   streamlit run app.py
+   python -m streamlit run app.py
    ```
    
    Or use the convenience script:
