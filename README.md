@@ -185,25 +185,9 @@ All documentation is organized in the `docs/` directory:
 ✅ **Testing**: 1,127 tests with fast/slow separation, representative subsets passing  
 ✅ **Documentation**: Consolidated into `docs/` with index and corrected QA report  
 
-### Pending
-⚠️ **Code Organization**: `app.py` is 3,401 lines - needs refactoring into modules (deferred for dedicated session)  
-⚠️ **Test Coverage**: Automated coverage reporting not working (pytest-cov issue) - manual verification only  
-⚠️ **Clean Install**: Fresh venv install test not performed  
 
-### Known Gaps
-- `run_autonomous_campaign` has no test coverage (actively used in Campaign Swarm)
-- Real platform OAuth flows require manual testing with live credentials
-- Full test suite times out on some environments (FFmpeg-intensive tests)
-
-See `PRODUCTION_AUDIT_FINDINGS.md` for complete audit details.
 
 ---
-
-## Known Issues
-
-1. **Test suite timeout**: Full suite with slow FFmpeg tests can exceed 5 minutes. Use `-m "not slow"` for fast development feedback.
-2. **pytest-cov not working**: Coverage reporting unavailable despite plugin installation. Manual test counting used.
-3. **app.py monolith**: Main file is too large (3,401 lines). Refactoring to `pages/` modules recommended.
 
 ---
 
