@@ -1,0 +1,87 @@
+[
+  {
+    "operation": "startup_core_imports",
+    "seconds": 0.3838,
+    "notes": "cold import of core modules"
+  },
+  {
+    "operation": "media_probe_single",
+    "seconds": 0.1127,
+    "notes": ""
+  },
+  {
+    "operation": "media_probe_x10_same_file",
+    "seconds": 0.9127,
+    "notes": "repeated probe of identical file"
+  },
+  {
+    "operation": "capability_check_x10",
+    "seconds": 0.2121,
+    "notes": ""
+  },
+  {
+    "operation": "thumbnail_generation",
+    "seconds": 1.8831,
+    "notes": ""
+  },
+  {
+    "operation": "highlight_detection",
+    "seconds": 0.0973,
+    "notes": ""
+  },
+  {
+    "operation": "single_clip_trim_render",
+    "seconds": 1.4244,
+    "notes": ""
+  },
+  {
+    "operation": "transition_render_mixed",
+    "seconds": 6.0834,
+    "notes": "720p24 -> portrait30 fade"
+  },
+  {
+    "operation": "multi_clip_render",
+    "seconds": 3.9695,
+    "notes": ""
+  },
+  {
+    "operation": "audio_mastering_lufs",
+    "seconds": 0.7148,
+    "notes": ""
+  },
+  {
+    "operation": "caption_generation",
+    "seconds": 0.0061,
+    "notes": ""
+  },
+  {
+    "operation": "image_color_grading_1440p",
+    "seconds": 0.3516,
+    "notes": ""
+  },
+  {
+    "operation": "platform_export_tiktok",
+    "seconds": 2.7403,
+    "notes": ""
+  },
+  {
+    "operation": "project_save_load",
+    "seconds": 0.0237,
+    "notes": ""
+  },
+  {
+    "operation": "encode_1080p_ultrafast",
+    "seconds": 1.0094,
+    "notes": "preview profile"
+  },
+  {
+    "operation": "encode_1080p_medium",
+    "seconds": 3.9684,
+    "notes": "final profile"
+  },
+  {
+    "operation": "encode_size_delta",
+    "seconds": 0,
+    "notes": "preview_bytes=4988013 final_bytes=1879259"
+  }
+]

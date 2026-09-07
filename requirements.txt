@@ -1,0 +1,37 @@
+# Core dependencies with pinned versions for reproducibility
+# Updated: 2026-09-06
+
+# AI & ML
+google-genai==1.5.2
+torch==2.1.2
+onnxruntime==1.17.0
+openai-whisper==20231117
+
+# Web framework
+streamlit==1.30.0
+fastmcp==0.1.5
+
+# Media processing
+ffmpeg-python==0.2.0
+opencv-python-headless==4.9.0.80
+Pillow==10.2.0
+rembg==2.0.56
+
+# Data & utilities
+pandas==2.2.0
+numpy==1.26.3
+python-dotenv==1.0.1
+pydantic==2.5.3
+requests==2.31.0
+
+# TTS
+gTTS==2.5.1
+edge-tts==6.1.10
+
+# UI components
+streamlit-image-comparison==0.0.4
+
+# Testing
+pytest==8.0.0
+pytest-cov==4.1.0
+

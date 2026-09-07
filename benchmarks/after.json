@@ -1,0 +1,97 @@
+[
+  {
+    "operation": "startup_core_imports",
+    "seconds": 0.6933,
+    "notes": "cold import of core modules"
+  },
+  {
+    "operation": "media_probe_single",
+    "seconds": 0.1261,
+    "notes": ""
+  },
+  {
+    "operation": "media_probe_x10_same_file",
+    "seconds": 0.0072,
+    "notes": "repeated probe of identical file"
+  },
+  {
+    "operation": "capability_check_x10",
+    "seconds": 0.2789,
+    "notes": ""
+  },
+  {
+    "operation": "thumbnail_generation",
+    "seconds": 1.1189,
+    "notes": "cold generation path"
+  },
+  {
+    "operation": "thumbnail_generation_cached",
+    "seconds": 0.015,
+    "notes": "identical request served from asset cache"
+  },
+  {
+    "operation": "highlight_detection",
+    "seconds": 0.0017,
+    "notes": ""
+  },
+  {
+    "operation": "single_clip_trim_render",
+    "seconds": 1.395,
+    "notes": ""
+  },
+  {
+    "operation": "transition_render_mixed",
+    "seconds": 6.1663,
+    "notes": "720p24 -> portrait30 fade"
+  },
+  {
+    "operation": "transition_render_cached",
+    "seconds": 2.5392,
+    "notes": "identical clips re-rendered via normalization cache"
+  },
+  {
+    "operation": "multi_clip_render",
+    "seconds": 3.858,
+    "notes": ""
+  },
+  {
+    "operation": "audio_mastering_lufs",
+    "seconds": 0.7532,
+    "notes": ""
+  },
+  {
+    "operation": "caption_generation",
+    "seconds": 0.0045,
+    "notes": ""
+  },
+  {
+    "operation": "image_color_grading_1440p",
+    "seconds": 0.3178,
+    "notes": ""
+  },
+  {
+    "operation": "platform_export_tiktok",
+    "seconds": 2.611,
+    "notes": ""
+  },
+  {
+    "operation": "project_save_load",
+    "seconds": 0.02,
+    "notes": ""
+  },
+  {
+    "operation": "encode_1080p_ultrafast",
+    "seconds": 0.9536,
+    "notes": "preview profile"
+  },
+  {
+    "operation": "encode_1080p_medium",
+    "seconds": 3.7011,
+    "notes": "final profile"
+  },
+  {
+    "operation": "encode_size_delta",
+    "seconds": 0,
+    "notes": "preview_bytes=4988013 final_bytes=1879259"
+  }
+]

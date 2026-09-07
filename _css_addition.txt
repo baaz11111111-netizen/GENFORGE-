@@ -1,0 +1,791 @@
+﻿
+/* ═══════════════════════════════════════════════════════════════
+   GENFORGE v3 VISUAL UPGRADE — Studio-Grade UI
+   All rules here override and extend the base system.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Typography — Inter + JetBrains Mono ─────────────────────── */
+.stApp {{
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}}
+code, .gf-mono, .gf-project-id, .gf-clip-num {{
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace !important;
+  font-size: .8rem;
+  letter-spacing: -.01em;
+}}
+
+/* ── App background — deep cinema black ──────────────────────── */
+.stApp, body {{ background: #070A0E !important; }}
+.block-container {{ background: transparent !important; max-width: 1640px; padding: 0 1.25rem 3rem; }}
+
+/* ── SIDEBAR — Professional nav rail ──────────────────────────── */
+[data-testid="stSidebar"] {{
+  background: linear-gradient(180deg, #0A0D12 0%, #0C0F15 100%) !important;
+  border-right: 1px solid #1E2530 !important;
+  box-shadow: 2px 0 20px rgba(0,0,0,.4) !important;
+}}
+[data-testid="stSidebar"] > div:first-child {{
+  padding: 1.25rem .85rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}}
+/* Nav items */
+[data-testid="stSidebar"] [role="radiogroup"] label {{
+  width: 100%;
+  border-radius: 8px;
+  padding: 7px 11px;
+  transition: all .14s ease;
+  position: relative;
+  margin-bottom: 1px;
+  border: 1px solid transparent;
+}}
+[data-testid="stSidebar"] [role="radiogroup"] label:hover {{
+  background: rgba(129,140,248,.07);
+  border-color: rgba(129,140,248,.12);
+}}
+[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) {{
+  background: rgba(99,102,241,.14) !important;
+  border-color: rgba(99,102,241,.3) !important;
+  box-shadow: 0 0 0 1px rgba(99,102,241,.1) inset;
+}}
+[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked)::before {{
+  content: "";
+  position: absolute;
+  left: 0; top: 5px; bottom: 5px;
+  width: 3px;
+  background: linear-gradient(180deg, #818CF8, #6366F1);
+  border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 8px rgba(129,140,248,.6);
+}}
+[data-testid="stSidebar"] [role="radiogroup"] label p {{
+  font-size: .83rem;
+  font-weight: 500;
+  color: #7A8599;
+  letter-spacing: -.005em;
+}}
+[data-testid="stSidebar"] [role="radiogroup"] label:hover p {{ color: #C8D0DC; }}
+[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) p {{
+  color: #E2E8F0 !important;
+  font-weight: 600;
+}}
+/* Brand in sidebar */
+.gf-brand {{
+  font-family: 'Inter', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -.035em;
+  color: #F0F4FF;
+  line-height: 1;
+  background: linear-gradient(135deg, #E8ECF3 30%, #818CF8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}}
+.gf-brand-glyph {{
+  -webkit-text-fill-color: #6366F1;
+  color: #6366F1;
+  filter: drop-shadow(0 0 6px rgba(99,102,241,.7));
+}}
+.gf-kicker {{
+  font-size: .65rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #4A5568;
+  font-weight: 600;
+}}
+.gf-section-label {{
+  font-size: .62rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #374151;
+  font-weight: 700;
+  margin: 18px 0 5px 2px;
+  display: block;
+}}
+
+/* ── TOP BAR — Editor toolbar ─────────────────────────────────── */
+.gf-app-header {{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #0E1218 0%, #111520 100%);
+  border: 1px solid #1E2A38;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.03);
+  animation: gfFadeIn .2s ease both;
+}}
+.gf-header-center {{
+  flex: 1;
+  min-width: 0;
+  padding: 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}}
+.gf-header-status {{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}}
+.gf-project-tag {{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .76rem;
+  font-weight: 600;
+  color: #6B7786;
+  letter-spacing: -.005em;
+}}
+.gf-page-note {{
+  font-size: .7rem;
+  color: #3D4A57;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}}
+.gf-status-chip {{
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: .68rem;
+  font-weight: 700;
+  border: 1px solid #1E2A38;
+  color: #4A5568;
+  white-space: nowrap;
+  letter-spacing: .03em;
+}}
+.gf-status-chip::before {{
+  content: "";
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+  opacity: .8;
+}}
+.gf-status-chip.chip-on {{
+  color: #34D399;
+  border-color: rgba(52,211,153,.25);
+  background: rgba(52,211,153,.07);
+}}
+.gf-status-chip.chip-off {{
+  color: #F87171;
+  border-color: rgba(248,113,113,.25);
+  background: rgba(248,113,113,.07);
+}}
+.gf-status-chip.chip-warn {{
+  color: #FBBF24;
+  border-color: rgba(251,191,36,.25);
+  background: rgba(251,191,36,.07);
+  animation: gfPulse 2s ease-in-out infinite;
+}}
+
+/* ── BUTTONS — Premium studio controls ───────────────────────── */
+.stButton > button,
+.stDownloadButton > button,
+.stFormSubmitButton > button {{
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #1E2A38;
+  background: linear-gradient(135deg, #131820 0%, #161C26 100%);
+  color: #B0B9C8;
+  font-weight: 500;
+  font-size: .82rem;
+  min-height: 34px;
+  padding: 6px 14px;
+  transition: all .13s ease;
+  letter-spacing: -.008em;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.03);
+}}
+.stButton > button:hover,
+.stDownloadButton > button:hover,
+.stFormSubmitButton > button:hover {{
+  background: linear-gradient(135deg, #181E2A 0%, #1C2233 100%);
+  border-color: rgba(129,140,248,.3);
+  color: #E2E8F0;
+  box-shadow: 0 2px 8px rgba(0,0,0,.4), 0 0 0 1px rgba(129,140,248,.1);
+  transform: translateY(-1px);
+}}
+.stButton > button:active {{ transform: translateY(0) scale(.98); }}
+.stButton > button[kind="primary"],
+.stFormSubmitButton > button[kind="primary"] {{
+  background: linear-gradient(135deg, #4F46E5 0%, #6366F1 50%, #818CF8 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  font-weight: 600 !important;
+  box-shadow: 0 3px 12px rgba(99,102,241,.45), 0 1px 2px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.15) !important;
+  letter-spacing: -.01em;
+  position: relative;
+  overflow: hidden;
+}}
+.stButton > button[kind="primary"]:hover,
+.stFormSubmitButton > button[kind="primary"]:hover {{
+  box-shadow: 0 4px 18px rgba(99,102,241,.6), 0 2px 4px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.2) !important;
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}}
+.stButton > button[kind="primary"]::after {{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,.25) 0%, transparent 70%);
+  opacity: 0;
+  transform: scale(0);
+  transition: transform .5s ease-out, opacity .5s ease-out;
+}}
+.stButton > button[kind="primary"]:active::after {{
+  opacity: 1;
+  transform: scale(2.5);
+  transition: none;
+}}
+.stButton > button:disabled {{ opacity: .35; transform: none; box-shadow: none; }}
+
+/* ── INPUTS — Studio-grade fields ────────────────────────────── */
+.stTextInput input,
+.stTextArea textarea,
+.stNumberInput input {{
+  background: #0D1118 !important;
+  border: 1px solid #1E2A38 !important;
+  border-radius: 8px !important;
+  color: #E2E8F0 !important;
+  font-size: .84rem !important;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.4) !important;
+  transition: border-color .13s ease, box-shadow .13s ease !important;
+}}
+.stTextInput input:focus,
+.stTextArea textarea:focus,
+.stNumberInput input:focus {{
+  border-color: rgba(99,102,241,.6) !important;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.4), 0 0 0 3px rgba(99,102,241,.18) !important;
+}}
+[data-baseweb="select"] > div {{
+  background: #0D1118 !important;
+  border-color: #1E2A38 !important;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.4);
+}}
+[data-testid="stFileUploader"] {{
+  background: linear-gradient(135deg, #0D1118 0%, #111520 100%);
+  border: 1px dashed #1E2A38;
+  border-radius: 10px;
+  transition: all .15s ease;
+}}
+[data-testid="stFileUploader"]:hover {{
+  border-color: rgba(99,102,241,.4);
+  background: linear-gradient(135deg, #10151F 0%, #141A26 100%);
+}}
+
+/* ── TABS — Studio panel tabs ────────────────────────────────── */
+.stTabs [data-baseweb="tab-list"] {{
+  background: #0A0D12 !important;
+  border-bottom: 1px solid #1A2232 !important;
+  padding: 0 4px;
+  gap: 0;
+  border-radius: 10px 10px 0 0;
+  overflow-x: auto;
+}}
+.stTabs [data-baseweb="tab"] {{
+  padding: 9px 14px;
+  font-size: .78rem;
+  font-weight: 500;
+  color: #5A6474;
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  transition: all .13s ease;
+  white-space: nowrap;
+}}
+.stTabs [data-baseweb="tab"]:hover {{ color: #9CA8B8; }}
+.stTabs [aria-selected="true"] {{
+  color: #C8D4E8 !important;
+  font-weight: 600 !important;
+  background: transparent !important;
+  border-bottom: 2px solid #6366F1 !important;
+  box-shadow: none !important;
+  text-shadow: 0 0 20px rgba(129,140,248,.3);
+}}
+
+/* ── CARDS — Studio surface cards ───────────────────────────── */
+.gf-card, .studio-card {{
+  background: linear-gradient(145deg, #0E1218 0%, #111520 100%);
+  border: 1px solid #1A2232;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.025);
+  animation: gfFadeUp .25s ease both;
+  transition: border-color .14s ease, box-shadow .14s ease;
+}}
+.gf-card:hover, .studio-card:hover {{
+  border-color: #243040;
+  box-shadow: 0 4px 20px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.03);
+}}
+.gf-card-title {{ font-size: .96rem; font-weight: 600; color: #DDE4EF; margin: 0 0 3px; letter-spacing: -.02em; }}
+.gf-card-sub {{ font-size: .75rem; color: #566070; margin: 0; }}
+.studio-card h3 {{ font-size: .96rem; font-weight: 600; margin: 0; color: #DDE4EF; letter-spacing: -.02em; }}
+.studio-card p {{ color: #566070; margin-top: 6px; font-size: .8rem; line-height: 1.5; }}
+
+/* ── PROJECT CARDS — Rich studio project tiles ───────────────── */
+.gf-project-card {{
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: start;
+  gap: 14px;
+  background: linear-gradient(145deg, #0E1218 0%, #111520 100%);
+  border: 1px solid #1A2232;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.02);
+  transition: all .15s ease;
+  animation: gfFadeUp .25s ease both;
+  cursor: default;
+}}
+.gf-project-card:hover {{
+  border-color: rgba(99,102,241,.3);
+  background: linear-gradient(145deg, #10151D 0%, #13192300%);
+  box-shadow: 0 4px 20px rgba(0,0,0,.4), 0 0 0 1px rgba(99,102,241,.08);
+  transform: translateY(-1px);
+}}
+.gf-project-icon {{
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1A2035 0%, #202840 100%);
+  border: 1px solid rgba(99,102,241,.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  flex: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.04);
+}}
+.gf-project-meta {{ min-width: 0; padding-top: 1px; }}
+.gf-project-name {{
+  font-size: .88rem;
+  font-weight: 600;
+  color: #DDE4EF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -.015em;
+  margin-bottom: 3px;
+}}
+.gf-project-detail {{
+  font-size: .71rem;
+  color: #455060;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}}
+.gf-project-badge {{
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  padding-top: 2px;
+}}
+
+/* ── BADGES — Status indicators ─────────────────────────────── */
+.gf-badge {{
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  border: 1px solid;
+  white-space: nowrap;
+}}
+.gf-badge::before {{
+  content: "";
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}}
+.gf-badge-ok    {{ color:#34D399; border-color:rgba(52,211,153,.3); background:rgba(52,211,153,.08); }}
+.gf-badge-warn  {{ color:#FBBF24; border-color:rgba(251,191,36,.3); background:rgba(251,191,36,.08); }}
+.gf-badge-err   {{ color:#F87171; border-color:rgba(248,113,113,.3); background:rgba(248,113,113,.08); }}
+.gf-badge-info  {{ color:#60A5FA; border-color:rgba(96,165,250,.3); background:rgba(96,165,250,.08); }}
+.gf-badge-draft {{ color:#566070; border-color:#1E2A38; background:transparent; }}
+/* Status tag legacy aliases */
+.gf-status-tag        {{ display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px; font-size:.65rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; border:1px solid #1E2A38; color:#566070; white-space:nowrap; }}
+.gf-status-tag.ok     {{ color:#34D399; border-color:rgba(52,211,153,.3); background:rgba(52,211,153,.08); }}
+.gf-status-tag.err    {{ color:#F87171; border-color:rgba(248,113,113,.3); background:rgba(248,113,113,.08); }}
+.gf-row-card {{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: linear-gradient(135deg, #0C1018 0%, #0E1320 100%);
+  border: 1px solid #182030;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  transition: all .13s ease;
+}}
+.gf-row-card:hover {{ border-color: #243040; background: linear-gradient(135deg, #0E1420 0%, #111828 100%); }}
+.gf-row-title {{ font-size: .84rem; font-weight: 600; color: #C8D0DC; overflow-wrap: anywhere; letter-spacing: -.01em; }}
+.gf-row-sub {{ font-size: .7rem; color: #455060; margin-top: 2px; overflow-wrap: anywhere; }}
+.gf-row-side {{ display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex:none; }}
+
+/* ── SYSTEM STATUS PILLS ─────────────────────────────────────── */
+.gf-sys-pill, .status-pill-green, .status-pill-red {{
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: .72rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  border: 1px solid transparent;
+  letter-spacing: .01em;
+}}
+.gf-sys-pill::before, .status-pill-green::before, .status-pill-red::before {{
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex: none;
+}}
+.gf-sys-pill-on, .status-pill-green {{
+  color: #34D399;
+  border-color: rgba(52,211,153,.2);
+  background: rgba(52,211,153,.06);
+}}
+.gf-sys-pill-on::before, .status-pill-green::before {{ background: #34D399; box-shadow: 0 0 6px rgba(52,211,153,.6); }}
+.gf-sys-pill-off, .status-pill-red {{
+  color: #F87171;
+  border-color: rgba(248,113,113,.2);
+  background: rgba(248,113,113,.06);
+}}
+.gf-sys-pill-off::before, .status-pill-red::before {{ background: #F87171; }}
+
+/* ── HERO — Home page header ─────────────────────────────────── */
+.gf-hero {{
+  margin-bottom: 24px;
+  animation: gfFadeUp .3s ease both;
+  position: relative;
+}}
+.gf-hero-title, .hero-title {{
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -.04em;
+  color: #F0F4FF;
+  margin: 0 0 6px;
+  text-wrap: balance;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #E8ECF3 0%, #B4BDCF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}}
+.gf-hero-sub, .hero-sub {{
+  font-size: .9rem;
+  color: #4A5568;
+  margin: 0 0 20px;
+  line-height: 1.55;
+  animation: gfFadeUp .3s ease .05s both;
+}}
+
+/* ── PREVIEW CANVAS ──────────────────────────────────────────── */
+.gf-canvas {{
+  background: #05070A;
+  border: 1px solid #1A2232;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: inset 0 2px 12px rgba(0,0,0,.5);
+}}
+.gf-canvas-empty {{
+  background: linear-gradient(135deg, #07090E 0%, #09101A 100%);
+  border: 1px dashed #1A2232;
+  border-radius: 12px;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 28px;
+  animation: gfFadeIn .35s ease both;
+}}
+.gf-canvas-empty-icon {{ font-size: 2.2rem; opacity: .25; margin-bottom: 6px; }}
+.gf-canvas-empty-title {{ font-size: .95rem; font-weight: 600; color: #3A4455; letter-spacing: -.01em; }}
+.gf-canvas-empty-hint {{ font-size: .78rem; color: #2A3545; max-width: 300px; line-height: 1.55; text-align: center; }}
+
+/* ── TIMELINE — Professional editor track ────────────────────── */
+.gf-timeline-ruler {{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #3A4455;
+  font-size: .65rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: 0 0 6px;
+  padding: 0 4px;
+}}
+.gf-timeline-track {{
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+  min-height: 96px;
+  padding: 10px 14px;
+  margin: 0 0 10px;
+  border: 1px solid #182030;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #05080D 0%, #070A10 100%);
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  box-shadow: inset 0 2px 12px rgba(0,0,0,.4);
+}}
+.gf-timeline-track:empty::after {{
+  content: "Upload clips to build your timeline";
+  color: #2A3545;
+  font-size: .8rem;
+  align-self: center;
+  margin: auto;
+  letter-spacing: -.005em;
+}}
+.gf-timeline-block {{
+  min-width: 150px;
+  max-width: 230px;
+  flex: 1;
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #0F1520 0%, #131A28 100%);
+  border: 1px solid #1E2A3A;
+  border-left: 3px solid #2E3A4A;
+  color: #C0CBDA;
+  font-size: .78rem;
+  transition: all .13s ease;
+  cursor: default;
+  user-select: none;
+  box-shadow: 0 1px 4px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.02);
+  position: relative;
+  overflow: hidden;
+}}
+.gf-timeline-block::after {{
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.04), transparent);
+}}
+.gf-timeline-block:hover {{
+  background: linear-gradient(145deg, #141B2A 0%, #172030 100%);
+  border-color: #2A3A50;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.03);
+}}
+.gf-timeline-block.selected {{
+  background: linear-gradient(145deg, #14182E 0%, #182038 100%) !important;
+  border-color: rgba(99,102,241,.5) !important;
+  border-left-color: #6366F1 !important;
+  box-shadow: 0 3px 14px rgba(99,102,241,.25), inset 0 1px 0 rgba(129,140,248,.08) !important;
+}}
+.gf-timeline-block strong {{
+  display: block;
+  color: #3A4A5A;
+  font-size: .62rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 4px;
+}}
+.gf-timeline-block.selected strong {{ color: #8B97F8; }}
+.gf-timeline-block span {{
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 3px 0 4px;
+  font-weight: 600;
+  color: #C8D4E8;
+  font-size: .8rem;
+  letter-spacing: -.01em;
+}}
+.gf-timeline-block small {{
+  display: block;
+  color: #3A4A5A;
+  font-size: .68rem;
+  font-family: 'JetBrains Mono', monospace;
+}}
+
+/* ── METRIC TILES ────────────────────────────────────────────── */
+.gf-metric {{
+  background: linear-gradient(135deg, #0E1218 0%, #111520 100%);
+  border: 1px solid #182030;
+  border-radius: 10px;
+  padding: 12px 16px;
+  animation: gfFadeUp .3s ease both;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}}
+.gf-metric-label {{ font-size: .65rem; text-transform: uppercase; letter-spacing: .1em; color: #3A4455; font-weight: 700; }}
+.gf-metric-value {{ font-size: 1.15rem; font-weight: 700; margin-top: 4px; color: #DDE4EF; letter-spacing: -.025em; }}
+
+/* ── EMPTY STATE ─────────────────────────────────────────────── */
+.gf-empty {{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 28px;
+  text-align: center;
+  animation: gfFadeIn .35s ease both;
+}}
+.gf-empty-icon {{ font-size: 2.4rem; opacity: .2; }}
+.gf-empty-title {{ font-size: .95rem; font-weight: 600; color: #3A4455; letter-spacing: -.015em; }}
+.gf-empty-body {{ font-size: .8rem; color: #2A3545; max-width: 290px; line-height: 1.6; }}
+
+/* ── STAGE PROGRESS BAR ──────────────────────────────────────── */
+.gf-stage-bar {{ display:flex; gap:4px; align-items:center; margin:10px 0; flex-wrap:wrap; }}
+.gf-stage-step {{
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 11px; border-radius: 999px;
+  font-size: .68rem; font-weight: 700; letter-spacing: .04em;
+  background: #0D1118; border: 1px solid #1A2232; color: #3A4455;
+}}
+.gf-stage-step.active {{ background: rgba(99,102,241,.12); border-color: rgba(99,102,241,.35); color: #818CF8; animation: gfPulse 1.8s ease-in-out infinite; }}
+.gf-stage-step.done   {{ background: rgba(52,211,153,.08); border-color: rgba(52,211,153,.25); color: #34D399; }}
+.gf-stage-step.error  {{ background: rgba(248,113,113,.08); border-color: rgba(248,113,113,.25); color: #F87171; }}
+
+/* ── AI PANEL ────────────────────────────────────────────────── */
+.gf-ai-panel {{
+  background: linear-gradient(135deg, #0A0D18 0%, #0D1020 100%);
+  border: 1px solid rgba(99,102,241,.25);
+  border-radius: 12px;
+  padding: 14px 16px;
+  animation: gfFadeUp .22s ease both;
+  box-shadow: 0 0 20px rgba(99,102,241,.06), inset 0 1px 0 rgba(129,140,248,.04);
+}}
+.gf-ai-panel-header {{ display:flex; align-items:center; gap:9px; margin-bottom:12px; }}
+.gf-ai-dot {{
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #6366F1;
+  animation: gfPulse 1.8s ease-in-out infinite;
+  flex: none;
+  box-shadow: 0 0 8px rgba(99,102,241,.7);
+}}
+.gf-ai-title {{ font-size: .8rem; font-weight: 600; color: #818CF8; letter-spacing: -.01em; }}
+.gf-ai-plan-item {{
+  display: flex; align-items: flex-start; gap: 9px;
+  padding: 6px 0;
+  border-bottom: 1px solid #131A28;
+  font-size: .8rem; color: #9CA8B8;
+}}
+.gf-ai-plan-item:last-child {{ border-bottom: none; }}
+.gf-ai-plan-check {{ color: #34D399; flex: none; margin-top: 1px; font-weight: 700; }}
+
+/* ── BANNER NOTIFICATIONS ────────────────────────────────────── */
+.gf-banner {{
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: 10px;
+  font-size: .8rem; margin-bottom: 12px;
+  animation: gfSlideInLeft .2s ease both;
+  font-weight: 500;
+}}
+.gf-banner-ok   {{ background: rgba(52,211,153,.07);  border: 1px solid rgba(52,211,153,.22);  color: #34D399; }}
+.gf-banner-warn {{ background: rgba(251,191,36,.07);  border: 1px solid rgba(251,191,36,.22);  color: #FBBF24; }}
+.gf-banner-err  {{ background: rgba(248,113,113,.07); border: 1px solid rgba(248,113,113,.22); color: #F87171; }}
+.gf-banner-info {{ background: rgba(96,165,250,.07);  border: 1px solid rgba(96,165,250,.22);  color: #60A5FA; }}
+
+/* ── ALERTS, METRICS, EXPANDERS ──────────────────────────────── */
+[data-testid="stAlert"] {{ border-radius: 10px; border: 1px solid #1A2232; font-size: .8rem; background: #07090E; }}
+[data-testid="stMetric"] {{ background: linear-gradient(135deg, #0E1218 0%, #111520 100%); border: 1px solid #182030; border-radius: 10px; padding: 12px 16px; }}
+details[data-testid="stExpander"] {{ border: 1px solid #182030; border-radius: 10px; background: linear-gradient(135deg, #0E1218 0%, #111520 100%); }}
+details[data-testid="stExpander"] summary {{ font-size: .82rem; color: #7A8599; font-weight: 500; }}
+
+/* ── SCROLLBARS — Ultra-slim ──────────────────────────────────── */
+*::-webkit-scrollbar {{ width: 4px; height: 4px; }}
+*::-webkit-scrollbar-thumb {{ background: #1E2A38; border-radius: 999px; }}
+*::-webkit-scrollbar-thumb:hover {{ background: #2E3A50; }}
+*::-webkit-scrollbar-track {{ background: transparent; }}
+
+/* ── ANIMATIONS ──────────────────────────────────────────────── */
+@keyframes gfFadeUp {{
+  from {{ opacity:0; transform:translateY(8px); }}
+  to   {{ opacity:1; transform:none; }}
+}}
+@keyframes gfFadeIn {{ from {{ opacity:0; }} to {{ opacity:1; }} }}
+@keyframes gfSlideInLeft {{
+  from {{ opacity:0; transform:translateX(-10px); }}
+  to   {{ opacity:1; transform:none; }}
+}}
+@keyframes gfPulse {{ 0%,100% {{ opacity:.5; }} 50% {{ opacity:1; }} }}
+@keyframes gfShimmer {{
+  0%   {{ background-position:200% 0; }}
+  100% {{ background-position:-200% 0; }}
+}}
+@keyframes gfSpinGlow {{
+  from {{ transform:rotate(0deg); filter: drop-shadow(0 0 4px rgba(99,102,241,.6)); }}
+  to   {{ transform:rotate(360deg); filter: drop-shadow(0 0 4px rgba(99,102,241,.6)); }}
+}}
+@media (prefers-reduced-motion: reduce) {{
+  *, *::before, *::after {{ animation:none!important; transition:none!important; }}
+}}
+
+/* ── FOCUS ACCESSIBILITY ─────────────────────────────────────── */
+:focus-visible {{ outline: 2px solid rgba(99,102,241,.8); outline-offset: 2px; }}
+.stButton > button:focus-visible,
+.stFormSubmitButton > button:focus-visible {{
+  outline: 2px solid #6366F1;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(99,102,241,.2);
+}}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+@media (max-width:1100px) {{
+  [data-testid="stHorizontalBlock"] {{ flex-direction:column!important; gap:10px; }}
+  [data-testid="stHorizontalBlock"]>[data-testid="stColumn"] {{ width:100%!important; flex-basis:auto!important; flex-grow:1!important; max-width:100%!important; }}
+}}
+@media (max-width:900px) {{
+  .block-container {{ padding-left:.85rem; padding-right:.85rem; }}
+  .gf-app-header {{ flex-wrap:wrap; row-gap:8px; }}
+  .gf-header-status {{ margin-left:auto; }}
+  .stButton > button {{ width:100%; }}
+}}
+@media (max-width:760px) {{
+  .gf-page-note, .gf-page-sub {{ display:none; }}
+}}
+
+/* ── MISC STREAMLIT OVERRIDES ────────────────────────────────── */
+.stApp [data-testid="stVerticalBlock"] {{ gap:.55rem; }}
+[data-testid="stCheckbox"] label, [data-testid="stSidebar"] [role="radiogroup"] label {{
+  word-break:normal; overflow-wrap:normal;
+}}
+[data-baseweb="select"] span {{ white-space:nowrap; }}
+[data-testid="stSelectbox"] {{ min-width:0; width:100%; }}
+[data-baseweb="select"]>div {{ min-width:0; max-width:100%; }}
+.stTabs [data-baseweb="tab"] {{ white-space:nowrap; flex:none; }}
+.stTabs [data-baseweb="tab-list"] {{ overflow-x:auto; overflow-y:hidden; flex-wrap:nowrap; scrollbar-width:thin; }}
+.stButton,.stDownloadButton,.stFormSubmitButton {{ min-width:0; }}
+.stButton>button,.stDownloadButton>button,.stFormSubmitButton>button {{ white-space:normal; overflow-wrap:normal; word-break:normal; }}
+
+/* ── SHIMMER SKELETON ────────────────────────────────────────── */
+.gf-skeleton {{
+  background: linear-gradient(90deg, #0D1118 0%, #131A26 40%, #0D1118 80%);
+  background-size: 200% 100%;
+  animation: gfShimmer 1.6s infinite;
+  border-radius: 8px;
+}}
+
+/* ── SECTION LABEL ───────────────────────────────────────────── */
+.gf-section-label {{
+  font-size: .62rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #374151;
+  font-weight: 700;
+  margin: 18px 0 7px 0;
+  display: block;
+}}
+

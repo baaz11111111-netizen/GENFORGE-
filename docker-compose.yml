@@ -1,0 +1,50 @@
+# GENFORGE production deployment.
+# Secrets come from the .env file next to this compose file (never in the image).
+# All user data lives in named volumes so container recreation never loses data.
+services:
+  genforge:
+    build: .
+    image: genforge:latest
+    container_name: genforge
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8501:8501"   # bind locally; NGINX reverse proxy fronts the app
+    env_file:
+      - .env                     # GEMINI_API_KEY, GENFORGE_GEMINI_MODEL, publishing tokens
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PORT: "8501"               # image default is 7860 (HF Spaces); VPS keeps 8501
+      TMPDIR: /home/user/app/temp   # scratch files stay on the managed temp volume
+    volumes:                     # persistent user data (§deployment requirement 6/14)
+      - genforge_projects:/home/user/app/projects
+      - genforge_uploads:/home/user/app/uploads
+      - genforge_outputs:/home/user/app/outputs
+      - genforge_temp:/home/user/app/temp
+      - genforge_temp_inputs:/home/user/app/temp_inputs
+      - genforge_state:/home/user/app/publishing_state   # publishing accounts/secret store
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    logging:                     # bounded container logs
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 4G
+        reservations:
+          memory: 1G
+
+volumes:
+  genforge_projects:
+  genforge_uploads:
+  genforge_outputs:
+  genforge_temp:
+  genforge_temp_inputs:
+  genforge_state:

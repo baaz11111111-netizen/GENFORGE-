@@ -1,0 +1,49 @@
+# GENFORGE — professional editor theme (light default).
+# Light surfaces, visible borders, ONE restrained indigo accent used only for
+# active tools, selected clips, primary actions, focus and progress.
+# No gradients, no glassmorphism, no monochrome-only palette.
+
+[server]
+# Enable app/static/ file serving — required for the custom timeline component.
+# The timeline's index.html lives in static/timeline/index.html and is served
+# at /app/static/timeline/index.html without needing ScriptRunContext registration.
+enableStaticServing = true
+
+[theme]
+base = "light"
+primaryColor = "#818CF8"
+backgroundColor = "#F8FAFC"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#0F172A"
+linkColor = "#4F46E5"
+borderColor = "#CBD5E1"
+codeBackgroundColor = "#F1F5F9"
+codeTextColor = "#0F172A"
+
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+codeFont = "'JetBrains Mono':https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+baseFontSize = 14
+headingFontSizes = ["1.5rem", "1.2rem", "1.05rem", "0.95rem", "0.85rem", "0.8rem"]
+headingFontWeights = [600, 600, 600, 600, 600, 600]
+linkUnderline = false
+baseRadius = "8px"
+buttonRadius = "8px"
+showWidgetBorder = true
+showSidebarBorder = true
+# Chart palette is top-level only (not supported inside variant sections)
+chartCategoricalColors = ["#818CF8", "#34D399", "#F59E0B", "#60A5FA", "#F472B6"]
+
+redColor = "#F87171"
+orangeColor = "#FB923C"
+yellowColor = "#FBBF24"
+greenColor = "#34D399"
+blueColor = "#60A5FA"
+violetColor = "#A78BFA"
+grayColor = "#9AA4B2"
+
+[theme.sidebar]
+backgroundColor = "#0E1218"
+secondaryBackgroundColor = "#151A22"
+borderColor = "#232C39"
+textColor = "#E8ECF3"
+primaryColor = "#818CF8"

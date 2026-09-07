@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GENFORGE Timeline</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:transparent;font-family:'Inter',system-ui,sans-serif;color:#B8C8D8;font-size:12px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* ── Design tokens ── */
+:root{
+  --bg:        #04060A;
+  --surface:   #080B12;
+  --border:    #16202E;
+  --border2:   #1C2C3E;
+  --accent:    #6366F1;
+  --accent-lo: rgba(99,102,241,.18);
+  --accent-hi: rgba(99,102,241,.55);
+  --accent-glow: rgba(99,102,241,.6);
+  --text:      #B8C8D8;
+  --text-dim:  #354555;
+  --text-faint:#1C2A38;
+  --green:     #34D399;
+  --amber:     #FBBF24;
+  --red:       #F87171;
+  --snap-color:#34D399;
+  --track-h:   80px;
+  --ruler-h:   24px;
+  --handle-w:  9px;
+}
+
+/* ── Layout ── */
+#app{display:flex;flex-direction:column;gap:0;user-select:none;width:100%;
+  -webkit-user-select:none;}
+
+/* ── Ruler ── */
+#ruler{
+  position:relative;height:var(--ruler-h);
+  background:#030508;border:1px solid var(--border);
+  border-radius:6px 6px 0 0;overflow:hidden;margin-bottom:2px;
+  cursor:crosshair;
+}
+.tick{
+  position:absolute;top:0;bottom:0;
+  border-left:1px solid var(--border2);
+  display:flex;align-items:flex-end;padding:0 2px 3px 3px;
+  pointer-events:none;
+}
+.tick.major{border-left-color:rgba(99,102,241,.2)}
+.tick span{font-size:9px;font-weight:600;color:var(--text-faint);
+  letter-spacing:.03em;font-variant-numeric:tabular-nums;white-space:nowrap}
+#ruler-ph{
+  position:absolute;top:0;bottom:0;width:2px;
+  background:var(--accent);box-shadow:0 0 6px var(--accent-glow);
+  cursor:ew-resize;z-index:10;transform:translateX(-1px);
+  transition:none;
+}
+#ruler-ph-head{
+  position:absolute;top:-1px;left:-5px;
+  width:12px;height:12px;background:var(--accent);border-radius:50%;
+  box-shadow:0 0 8px var(--accent-glow);cursor:ew-resize;
+  border:1.5px solid rgba(255,255,255,.2);
+}
+#ruler-total{
+  position:absolute;right:6px;bottom:3px;
+  font-size:9px;font-weight:600;color:var(--text-faint);
+  font-variant-numeric:tabular-nums;pointer-events:none;
+}
+#ruler-ph-label{
+  position:absolute;top:3px;left:4px;
+  font-size:9px;font-weight:700;color:var(--accent);
+  font-variant-numeric:tabular-nums;pointer-events:none;
+  background:rgba(6,8,14,.85);padding:1px 5px;border-radius:3px;
+  white-space:nowrap;border:1px solid rgba(99,102,241,.2);
+}
+/* Snap tick on ruler */
+.snap-tick{
+  position:absolute;top:0;bottom:0;width:2px;
+  background:var(--snap-color);opacity:.7;pointer-events:none;z-index:9;
+}
+
+/* ── Track area ── */
+#track-wrap{position:relative;overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:thin;scrollbar-color:#1A2030 transparent}
+#track-wrap::-webkit-scrollbar{height:4px}
+#track-wrap::-webkit-scrollbar-thumb{background:#1A2030;border-radius:2px}
+#track{
+  display:flex;align-items:center;gap:0;
+  min-height:var(--track-h);padding:8px 10px;
+  background:var(--bg);border:1px solid var(--border);border-radius:0 0 8px 8px;
+  position:relative;min-width:100%;
+}
+/* Drag-over track (global drop target) */
+#track.track-drag-active{background:#04080F}
+
+/* ── Playhead needle over track ── */
+#track-ph{
+  position:absolute;top:0;bottom:0;width:2px;
+  background:rgba(99,102,241,.75);
+  box-shadow:0 0 8px rgba(99,102,241,.45);
+  pointer-events:none;z-index:20;transform:translateX(-1px);
+  transition:none;
+}
+#track-ph-head{
+  position:absolute;top:-2px;left:-3px;
+  width:8px;height:8px;background:var(--accent);border-radius:50%;
+}
+
+/* ── Drop insertion indicator ── */
+#drop-indicator{
+  position:absolute;top:4px;bottom:4px;width:3px;
+  background:var(--accent);border-radius:2px;
+  box-shadow:0 0 8px var(--accent-glow);
+  pointer-events:none;z-index:25;display:none;
+  transition:left .05s;
+}
+#drop-indicator::before{
+  content:'';position:absolute;top:-4px;left:-3px;
+  width:9px;height:9px;background:var(--accent);border-radius:50%;
+}
+#drop-indicator::after{
+  content:'';position:absolute;bottom:-4px;left:-3px;
+  width:9px;height:9px;background:var(--accent);border-radius:50%;
+}
+
+/* ── Clip gap ── */
+.clip-gap{width:3px;flex:none;background:transparent}
+
+/* ── Clip blocks ── */
+.clip{
+  position:relative;flex:0 0 auto;
+  border-radius:7px;min-height:calc(var(--track-h) - 16px);
+  background:linear-gradient(145deg,#0D1520 0%,#111C2C 100%);
+  border:1px solid var(--border2);border-left:3px solid #223448;
+  padding:5px 13px 5px 10px;
+  cursor:grab;
+  transition:border-color .1s,box-shadow .1s,transform .1s;
+  overflow:hidden;
+}
+.clip:hover{
+  border-color:#283A52;transform:translateY(-1px);
+  box-shadow:0 4px 12px rgba(0,0,0,.45);
+}
+.clip.selected{
+  border-color:var(--accent-hi) !important;
+  border-left-color:var(--accent) !important;
+  background:linear-gradient(145deg,#131830 0%,#182040 100%) !important;
+  box-shadow:0 0 0 1px rgba(99,102,241,.15),0 4px 16px rgba(99,102,241,.22) !important;
+}
+.clip.dragging{
+  opacity:.55;transform:scale(.96) translateY(-3px);
+  cursor:grabbing;z-index:30;box-shadow:0 8px 24px rgba(0,0,0,.6);
+}
+
+/* ── Thumbnail strip ── */
+.clip-thumb{
+  position:absolute;top:0;left:0;right:0;height:24px;
+  background-size:cover;background-position:center;
+  opacity:.18;border-radius:6px 6px 0 0;pointer-events:none;
+}
+
+/* ── Waveform SVG ── */
+.clip-waveform{
+  position:absolute;bottom:0;left:0;right:0;height:20px;
+  opacity:.5;pointer-events:none;overflow:hidden;
+}
+.clip-waveform svg{width:100%;height:100%;display:block}
+.wf-path{fill:none;stroke:rgba(99,102,241,.7);stroke-width:1.5px}
+
+/* Shimmer fallback when no waveform data */
+.clip-audio{
+  position:absolute;bottom:3px;left:10px;right:13px;height:3px;
+  border-radius:2px;
+  background:linear-gradient(90deg,#1E3050 0%,#263A5A 30%,#1A2A44 60%,#263A5A 80%,#1E3050 100%);
+  background-size:200% 100%;animation:shimmer 2.5s linear infinite;opacity:.45;
+  pointer-events:none;
+}
+@keyframes shimmer{0%{background-position:0 0}100%{background-position:-200% 0}}
+
+/* The iframe has its own document, so mirror the app theme here explicitly. */
+[data-theme="light"]{
+  --bg:#FFFFFF;--surface:#F8FAFC;--border:#E2E8F0;--border2:#CBD5E1;
+  --text:#0F172A;--text-dim:#64748B;--text-faint:#94A3B8;
+  --accent-lo:rgba(99,102,241,.12);--accent-hi:rgba(79,70,229,.55);
+}
+[data-theme="light"] #ruler{background:#F1F5F9}
+[data-theme="light"] #track.track-drag-active{background:#EEF2FF}
+[data-theme="light"] .clip{background:linear-gradient(145deg,#FFFFFF 0%,#F1F5F9 100%);border-left-color:#94A3B8}
+[data-theme="light"] .clip:hover{border-color:#94A3B8;box-shadow:0 4px 12px rgba(15,23,42,.12)}
+[data-theme="light"] .clip.selected{background:linear-gradient(145deg,#EEF2FF 0%,#E0E7FF 100%) !important;box-shadow:0 0 0 1px rgba(79,70,229,.15),0 4px 16px rgba(79,70,229,.18) !important}
+[data-theme="light"] .clip.dragging{box-shadow:0 8px 24px rgba(15,23,42,.18)}
+[data-theme="light"] #ruler-ph-label{background:rgba(255,255,255,.9)}
+[data-theme="light"] .clip-audio{background:linear-gradient(90deg,#C7D2FE 0%,#A5B4FC 30%,#C7D2FE 60%,#A5B4FC 80%,#C7D2FE 100%)}
+
+/* ── Clip content ── */
+.clip-num{
+  display:block;font-size:8px;font-weight:700;color:var(--text-faint);
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;
+  position:relative;z-index:1;
+}
+.clip.selected .clip-num{color:var(--accent)}
+.clip-label{
+  display:block;font-size:11px;font-weight:600;color:#B8C8D8;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:calc(100% - 4px);letter-spacing:-.01em;margin-bottom:2px;
+  position:relative;z-index:1;
+}
+.clip-meta{
+  display:flex;justify-content:space-between;align-items:center;gap:4px;
+  position:relative;z-index:1;
+}
+.clip-role{font-size:8px;color:var(--text-faint)}
+.clip-dur{
+  font-size:8px;font-weight:700;color:var(--text-dim);
+  font-variant-numeric:tabular-nums;
+}
+.clip.selected .clip-dur{color:var(--accent)}
+
+/* ── Trim handles ── */
+.trim-l,.trim-r{
+  position:absolute;top:0;bottom:0;width:var(--handle-w);
+  background:rgba(99,102,241,.22);cursor:ew-resize;z-index:15;
+  transition:background .1s,width .08s;
+}
+.trim-l{left:0;border-radius:7px 0 0 7px}
+.trim-r{right:0;border-radius:0 7px 7px 0}
+.trim-l:hover,.trim-r:hover,.trim-l.active,.trim-r.active{
+  background:rgba(99,102,241,.55);width:11px;
+}
+.trim-l::after,.trim-r::after{
+  content:'';position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:2px;height:18px;background:rgba(255,255,255,.35);border-radius:1px;
+}
+/* Live trim tooltip */
+.trim-tooltip{
+  position:fixed;background:#0A0E18;border:1px solid rgba(99,102,241,.4);
+  color:#A5B4FC;font-size:9px;font-weight:700;padding:3px 7px;border-radius:4px;
+  pointer-events:none;z-index:1000;white-space:nowrap;display:none;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ── Transition marker ── */
+.trans-marker{
+  display:flex;align-items:center;justify-content:center;
+  width:14px;flex:0 0 14px;color:var(--accent);font-size:12px;opacity:.65;
+  cursor:pointer;align-self:center;flex-shrink:0;
+  transition:opacity .1s;
+}
+.trans-marker:hover{opacity:1}
+.trans-marker.selected{opacity:1;color:#A5B4FC}
+
+/* ── Snap guide line over track ── */
+#snap-guide{
+  position:absolute;top:0;bottom:0;width:1px;
+  background:var(--snap-color);opacity:0;pointer-events:none;z-index:18;
+  transition:opacity .08s;
+}
+#snap-guide.visible{opacity:.8}
+
+/* ── Toolbar ── */
+#toolbar{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 0 3px;flex-wrap:nowrap;
+}
+button{
+  height:24px;padding:0 9px;border-radius:5px;border:1px solid var(--border2);
+  background:var(--surface);color:var(--text);font-size:10px;font-weight:600;
+  cursor:pointer;transition:all .1s;white-space:nowrap;font-family:inherit;
+  outline:none;
+}
+button:hover:not(:disabled){background:#111820;border-color:#283848;color:#C0D0E0}
+button:active:not(:disabled){transform:scale(.97)}
+button:disabled{opacity:.3;cursor:not-allowed}
+button.primary{background:var(--accent-lo);border-color:var(--accent-hi);color:#A5B4FC}
+button.primary:hover{background:rgba(99,102,241,.28)}
+button.danger{border-color:rgba(248,113,113,.25);color:var(--red)}
+button.danger:hover{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.5)}
+#toolbar .spacer{flex:1;min-width:4px}
+#zoom-val{
+  font-size:10px;color:var(--text-dim);font-weight:600;
+  font-variant-numeric:tabular-nums;min-width:26px;text-align:center;
+}
+/* Snap toggle button */
+#btn-snap{font-size:9px;padding:0 7px;letter-spacing:.02em}
+#btn-snap.snap-on{background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.3);
+  color:#34D399}
+#btn-snap.snap-off{opacity:.5}
+
+/* ── Status bar ── */
+#status{
+  font-size:9px;color:var(--text-faint);padding:3px 1px 0;
+  font-variant-numeric:tabular-nums;letter-spacing:.02em;
+  min-height:14px;
+}
+
+/* ── Focus ── */
+button:focus-visible{outline:2px solid rgba(99,102,241,.7);outline-offset:1px}
+</style>
+</head>
+<body>
+<div id="trim-tooltip" class="trim-tooltip"></div>
+<div id="app">
+  <div id="ruler" title="Click or drag to scrub">
+    <div id="ruler-ph"><div id="ruler-ph-head"></div></div>
+    <div id="ruler-ph-label">00:00.00</div>
+    <div id="ruler-total"></div>
+  </div>
+  <div id="track-wrap">
+    <div id="track" role="list" aria-label="Timeline clips">
+      <div id="drop-indicator"></div>
+      <div id="snap-guide"></div>
+      <div id="track-ph"><div id="track-ph-head"></div></div>
+    </div>
+  </div>
+  <div id="toolbar">
+    <button id="btn-move-left"  aria-label="Move clip earlier" title="Move earlier (←)">&#8592;</button>
+    <button id="btn-move-right" aria-label="Move clip later"   title="Move later (→)">&#8594;</button>
+    <button id="btn-dup"        aria-label="Duplicate clip"    title="Duplicate (D)">&#10697;</button>
+    <button id="btn-split"      aria-label="Split at playhead" title="Split at playhead (S)">&#9986;</button>
+    <button id="btn-delete"  class="danger" aria-label="Delete clip" title="Delete (Del)">&#128465;</button>
+    <button id="btn-reset"      aria-label="Reset clip order"  title="Reset order">&#8635;</button>
+    <span class="spacer"></span>
+    <button id="btn-snap" class="snap-on" aria-label="Toggle snap" title="Toggle snap to boundaries">Snap</button>
+    <span class="spacer"></span>
+    <button id="btn-zoom-out"   aria-label="Zoom out"          title="Zoom out (-)">&#8722;</button>
+    <span id="zoom-val">1.0&#215;</span>
+    <button id="btn-zoom-in"    aria-label="Zoom in"           title="Zoom in (+)">&#43;</button>
+    <button id="btn-fit"        aria-label="Fit timeline"      title="Fit to window">Fit</button>
+  </div>
+  <div id="status" aria-live="polite"></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   GENFORGE Timeline Component v2 — Phase 6 Professional
+   ═══════════════════════════════════════════════════════════════
+   Improvements over v1:
+   - Playhead: client-side smooth drag; Python notified only on pointerup
+   - Snap: to clip boundaries and playhead, with visual guide + ruler tick
+   - Drag-drop: precise insertion indicator between clips
+   - Track-level drop: drop in the gap between any two clips
+   - Waveform: real SVG path from waveform_peaks array; shimmer fallback
+   - Trim: live tooltip showing new start/end/duration during drag
+   - Pixel↔time: single timeToX/xToTime accounting for scroll and zoom
+   - No per-move Streamlit reruns for playhead or trim drag
+   ═══════════════════════════════════════════════════════════════ */
+
+// ── Streamlit component protocol ──────────────────────────────
+function sendValue(v) {
+  window.parent.postMessage({ isStreamlitMessage:true, type:'streamlit:setComponentValue', value:v }, '*');
+}
+function setFrameHeight(h) {
+  window.parent.postMessage({ isStreamlitMessage:true, type:'streamlit:setFrameHeight', height:h }, '*');
+}
+
+// ── Boot helpers ───────────────────────────────────────────────
+var _stopRetrying = function(){};  // replaced below
+
+// ── Constants ─────────────────────────────────────────────────
+var TRACK_PAD   = 10;  // px padding inside #track on each side
+var CLIP_GAP    = 3;   // px gap between clips
+var SNAP_THRESH = 8;   // px distance to snap
+var MIN_DUR     = 0.1; // minimum clip duration after trim (seconds)
+var ZOOM_MIN    = 0.25;
+var ZOOM_MAX    = 5.0;
+
+// ── State ─────────────────────────────────────────────────────
+var S = {
+  clips:    [],   // [{id,label,role,duration,trim_start,trim_end,thumbnail_b64,has_audio,waveform_peaks,transition}]
+  selected: null,
+  playhead: 0.0,
+  zoom:     1.0,
+  total_dur:0,
+  snap_on:  true,
+};
+
+// ── DOM refs ──────────────────────────────────────────────────
+var $ruler       = document.getElementById('ruler');
+var $track       = document.getElementById('track');
+var $trackWrap   = document.getElementById('track-wrap');
+var $rulerPh     = document.getElementById('ruler-ph');
+var $rulerLabel  = document.getElementById('ruler-ph-label');
+var $rulerTotal  = document.getElementById('ruler-total');
+var $trackPh     = document.getElementById('track-ph');
+var $dropInd     = document.getElementById('drop-indicator');
+var $snapGuide   = document.getElementById('snap-guide');
+var $status      = document.getElementById('status');
+var $trimTooltip = document.getElementById('trim-tooltip');
+
+// ── Utility ───────────────────────────────────────────────────
+function fmt(s) {
+  s = Math.max(0, s);
+  var m = Math.floor(s / 60);
+  var sec = s - m * 60;
+  return ('0'+m).slice(-2) + ':' + (sec < 10 ? '0':'') + sec.toFixed(2);
+}
+
+function clipEffDur(c) {
+  if (c.trim_end > c.trim_start) return c.trim_end - c.trim_start;
+  if (c.duration > 0) return Math.max(c.duration - c.trim_start, 0);
+  return 0;
+}
+
+function totalDur() {
+  return S.clips.reduce(function(a,c){ return a + clipEffDur(c); }, 0);
+}
+
+// ── Pixel ↔ Time conversions ───────────────────────────────────
+// All conversions are relative to the track's scrollLeft and padding.
+// Track content starts at TRACK_PAD px. Each second = pixPerSec px.
+// Total track content width = total_dur * pixPerSec + 2*TRACK_PAD.
+
+function pixPerSec() {
+  var td = S.total_dur;
+  if (td <= 0) return 100 * S.zoom;
+  var w = $track.clientWidth - 2 * TRACK_PAD;
+  if (w <= 0) w = 560;
+  return (w / td) * S.zoom;
+}
+
+function timeToX(t) {
+  // Returns pixel position relative to track left edge (not scrolled)
+  return TRACK_PAD + t * pixPerSec();
+}
+
+function xToTime(px) {
+  // px is relative to track left edge (add scrollLeft for mouse coords)
+  var pps = pixPerSec();
+  if (pps <= 0) return 0;
+  return Math.max(0, (px - TRACK_PAD) / pps);
+}
+
+function mouseXToTime(clientX) {
+  var rect = $trackWrap.getBoundingClientRect();
+  var px = clientX - rect.left + $trackWrap.scrollLeft;
+  return xToTime(px);
+}
+
+function rulerMouseXToTime(clientX) {
+  var rect = $ruler.getBoundingClientRect();
+  var pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  return pct * S.total_dur;
+}
+
+// ── Clip start times (cumulative) ─────────────────────────────
+function clipStartTimes() {
+  var starts = [];
+  var t = 0;
+  S.clips.forEach(function(c) {
+    starts.push(t);
+    t += clipEffDur(c);
+  });
+  return starts;
+}
+
+// ── Snap ──────────────────────────────────────────────────────
+// Returns snapped time and whether a snap occurred.
+function snapTime(t, excludeClipId) {
+  if (!S.snap_on) return { t: t, snapped: false, snapX: null };
+  var pps = pixPerSec();
+  var best = null;
+  var bestDist = SNAP_THRESH;
+  var starts = clipStartTimes();
+
+  // Snap targets: clip boundaries and timeline start/end
+  var targets = [0, S.total_dur];
+  S.clips.forEach(function(c, i) {
+    if (c.id !== excludeClipId) {
+      targets.push(starts[i]);
+      targets.push(starts[i] + clipEffDur(c));
+    }
+  });
+  // Playhead
+  targets.push(S.playhead);
+
+  targets.forEach(function(target) {
+    var dist = Math.abs(t - target) * pps;
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = target;
+    }
+  });
+
+  if (best !== null) {
+    return { t: best, snapped: true, snapX: timeToX(best) };
+  }
+  return { t: t, snapped: false, snapX: null };
+}
+
+function showSnapGuide(x) {
+  $snapGuide.style.left = x + 'px';
+  $snapGuide.classList.add('visible');
+}
+function hideSnapGuide() {
+  $snapGuide.classList.remove('visible');
+}
+
+// ── Tick density ──────────────────────────────────────────────
+function tickInterval(dur) {
+  var eff = dur / S.zoom;
+  if (eff <= 5)   return 1;
+  if (eff <= 15)  return 2;
+  if (eff <= 40)  return 5;
+  if (eff <= 90)  return 10;
+  if (eff <= 180) return 30;
+  if (eff <= 600) return 60;
+  return 120;
+}
+
+// ── Render ruler ──────────────────────────────────────────────
+function renderRuler() {
+  var td = S.total_dur;
+  // Remove old ticks
+  $ruler.querySelectorAll('.tick,.snap-tick').forEach(function(el){ el.remove(); });
+
+  if (td <= 0) {
+    $rulerTotal.textContent = '';
+    $rulerLabel.textContent = '00:00.00';
+    updatePlayheadDisplay();
+    return;
+  }
+
+  var intv = tickInterval(td);
+  var n = Math.floor(td / intv) + 2;
+  for (var i = 0; i <= n; i++) {
+    var t = i * intv;
+    if (t > td + intv) break;
+    var pct = Math.min(100, t / td * 100);
+    var tick = document.createElement('div');
+    tick.className = 'tick' + (i % 5 === 0 ? ' major' : '');
+    tick.style.left = pct + '%';
+    var sp = document.createElement('span');
+    sp.textContent = fmt(t);
+    tick.appendChild(sp);
+    $ruler.insertBefore(tick, $rulerPh);
+  }
+
+  $rulerTotal.textContent = fmt(td);
+  updatePlayheadDisplay();
+}
+
+function updatePlayheadDisplay() {
+  var td = S.total_dur;
+  var pct = td > 0 ? Math.min(100, S.playhead / td * 100) : 0;
+  $rulerPh.style.left = pct + '%';
+  $rulerLabel.textContent = fmt(S.playhead);
+
+  // Update track playhead needle
+  var x = timeToX(S.playhead) - $trackWrap.scrollLeft;
+  $trackPh.style.left = Math.max(0, x) + 'px';
+}
+
+// ── Waveform SVG ───────────────────────────────────────────────
+function buildWaveformSVG(peaks, w, h) {
+  // peaks: Float32Array or array of normalized values [-1,1] or [0,1]
+  if (!peaks || peaks.length === 0) return null;
+  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+  svg.setAttribute('preserveAspectRatio', 'none');
+
+  var n = peaks.length;
+  var mid = h / 2;
+  var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  var d = [];
+  for (var i = 0; i < n; i++) {
+    var x = (i / (n - 1)) * w;
+    var amp = Math.abs(typeof peaks[i] === 'number' ? peaks[i] : 0);
+    amp = Math.min(1, amp);
+    var y = mid - amp * (mid - 2);
+    d.push((i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1));
+  }
+  // Mirror bottom
+  for (var i = n - 1; i >= 0; i--) {
+    var x = (i / (n - 1)) * w;
+    var amp = Math.abs(typeof peaks[i] === 'number' ? peaks[i] : 0);
+    amp = Math.min(1, amp);
+    var y = mid + amp * (mid - 2);
+    d.push('L' + x.toFixed(1) + ' ' + y.toFixed(1));
+  }
+  d.push('Z');
+  path.setAttribute('d', d.join(' '));
+  path.setAttribute('class', 'wf-path');
+  path.style.fill = 'rgba(99,102,241,.35)';
+  path.style.stroke = 'none';
+  svg.appendChild(path);
+  return svg;
+}
+
+// ── Clip block width ──────────────────────────────────────────
+function clipWidth(c) {
+  var eff = clipEffDur(c);
+  var td  = S.total_dur;
+  var pps = pixPerSec();
+  if (eff > 0) return Math.max(100, Math.round(eff * pps));
+  return Math.round(140 * S.zoom);
+}
+
+// ── Render track ──────────────────────────────────────────────
+function renderTrack() {
+  // Remove clips but keep structural elements
+  $track.querySelectorAll('.clip,.clip-gap,.trans-marker').forEach(function(el){ el.remove(); });
+
+  // Insert clips before structural elements
+  var frag = document.createDocumentFragment();
+
+  S.clips.forEach(function(c, idx) {
+    // Transition marker between clips
+    if (idx > 0 && S.clips[idx-1].transition) {
+      var tm = document.createElement('div');
+      tm.className = 'trans-marker' + (S.selected === S.clips[idx-1].id ? ' selected' : '');
+      tm.setAttribute('data-trans-idx', idx - 1);
+      tm.title = 'Transition: ' + S.clips[idx-1].transition;
+      tm.textContent = '◇';
+      tm.addEventListener('click', function() {
+        emitEvent('select_transition', S.clips[idx-1].id, {transition: S.clips[idx-1].transition});
+      });
+      frag.appendChild(tm);
+    } else if (idx > 0) {
+      var gap = document.createElement('div');
+      gap.className = 'clip-gap';
+      frag.appendChild(gap);
+    }
+
+    var w   = clipWidth(c);
+    var eff = clipEffDur(c);
+    var durLabel = eff > 0 ? eff.toFixed(1)+'s' : 'full';
+
+    var div = document.createElement('div');
+    div.className = 'clip' + (c.id === S.selected ? ' selected' : '');
+    div.setAttribute('role', 'listitem');
+    div.setAttribute('aria-selected', c.id === S.selected ? 'true' : 'false');
+    div.setAttribute('tabindex', '0');
+    div.setAttribute('data-id', c.id);
+    div.setAttribute('data-idx', idx);
+    div.setAttribute('draggable', 'true');
+    div.style.width = w + 'px';
+    div.title = c.label;
+
+    // Thumbnail strip
+    if (c.thumbnail_b64) {
+      var thumb = document.createElement('div');
+      thumb.className = 'clip-thumb';
+      thumb.style.backgroundImage = 'url(data:image/png;base64,' + c.thumbnail_b64 + ')';
+      div.appendChild(thumb);
+    }
+
+    // Waveform or shimmer
+    if (c.waveform_peaks && c.waveform_peaks.length > 2) {
+      var wfDiv = document.createElement('div');
+      wfDiv.className = 'clip-waveform';
+      var svgEl = buildWaveformSVG(c.waveform_peaks, w, 20);
+      if (svgEl) wfDiv.appendChild(svgEl);
+      div.appendChild(wfDiv);
+    } else if (c.has_audio) {
+      var ab = document.createElement('div');
+      ab.className = 'clip-audio';
+      div.appendChild(ab);
+    }
+
+    // Left trim handle
+    var tl = document.createElement('div');
+    tl.className = 'trim-l';
+    tl.setAttribute('data-id', c.id);
+    tl.setAttribute('data-side', 'left');
+    tl.title = 'Trim in: ' + fmt(c.trim_start);
+    tl.setAttribute('aria-label', 'Trim in handle for ' + c.label);
+    div.appendChild(tl);
+
+    // Content
+    var num = document.createElement('span');
+    num.className = 'clip-num';
+    num.textContent = String(idx+1).padStart(2,'0');
+    div.appendChild(num);
+
+    var lbl = document.createElement('span');
+    lbl.className = 'clip-label';
+    lbl.textContent = c.label;
+    div.appendChild(lbl);
+
+    var meta = document.createElement('div');
+    meta.className = 'clip-meta';
+    var roleEl = document.createElement('span');
+    roleEl.className = 'clip-role';
+    roleEl.textContent = c.role || '';
+    var durEl = document.createElement('span');
+    durEl.className = 'clip-dur';
+    durEl.textContent = durLabel;
+    meta.appendChild(roleEl);
+    meta.appendChild(durEl);
+    div.appendChild(meta);
+
+    // Right trim handle
+    var tr = document.createElement('div');
+    tr.className = 'trim-r';
+    tr.setAttribute('data-id', c.id);
+    tr.setAttribute('data-side', 'right');
+    tr.title = 'Trim out: ' + (c.trim_end > 0 ? fmt(c.trim_end) : 'end');
+    tr.setAttribute('aria-label', 'Trim out handle for ' + c.label);
+    div.appendChild(tr);
+
+    // Events
+    div.addEventListener('click', onClipClick);
+    div.addEventListener('keydown', onClipKeydown);
+    div.addEventListener('dragstart', onDragStart);
+    div.addEventListener('dragover',  onDragOver);
+    div.addEventListener('dragleave', onDragLeave);
+    div.addEventListener('drop',      onDrop);
+    div.addEventListener('dragend',   onDragEnd);
+    tl.addEventListener('pointerdown', onTrimDown);
+    tr.addEventListener('pointerdown', onTrimDown);
+
+    frag.appendChild(div);
+  });
+
+  // Insert before structural elements (drop-indicator, snap-guide, track-ph)
+  $track.insertBefore(frag, $dropInd);
+
+  updateToolbar();
+  renderRuler();
+}
+
+// ── Toolbar state ─────────────────────────────────────────────
+function updateToolbar() {
+  var idx = S.clips.findIndex(function(c){ return c.id === S.selected; });
+  var n   = S.clips.length;
+  var td  = S.total_dur;
+
+  document.getElementById('btn-move-left').disabled  = idx <= 0;
+  document.getElementById('btn-move-right').disabled = idx < 0 || idx >= n - 1;
+  document.getElementById('btn-dup').disabled        = idx < 0 || n >= 12;
+  document.getElementById('btn-delete').disabled     = idx < 0 || n <= 1;
+  document.getElementById('btn-split').disabled      = idx < 0;
+  document.getElementById('zoom-val').textContent    = S.zoom.toFixed(1) + '\u00d7';
+
+  var snapBtn = document.getElementById('btn-snap');
+  snapBtn.className = S.snap_on ? 'snap-on' : 'snap-off';
+  snapBtn.textContent = S.snap_on ? 'Snap\u2713' : 'Snap';
+
+  // Status bar
+  var parts = [n + ' clip' + (n !== 1 ? 's' : '')];
+  if (td > 0) parts.push(fmt(td) + ' total');
+  if (idx >= 0) parts.push(S.clips[idx].label);
+  $status.textContent = parts.join(' \u00b7 ');
+}
+
+// ── Clip click ────────────────────────────────────────────────
+function onClipClick(e) {
+  if (e.target.classList.contains('trim-l') || e.target.classList.contains('trim-r')) return;
+  var id = e.currentTarget.getAttribute('data-id');
+  if (S.selected !== id) {
+    S.selected = id;
+    renderTrack();
+    emitEvent('select', id, null);
+  }
+}
+function onClipKeydown(e) {
+  if (e.key === 'Enter' || e.key === ' ') { onClipClick({currentTarget: e.currentTarget, target: e.currentTarget}); e.preventDefault(); }
+}
+
+// ── Drag & drop reorder ───────────────────────────────────────
+var _dragId      = null;
+var _dropTargetIdx = null; // insertion index (0 = before first clip)
+
+function onDragStart(e) {
+  _dragId = e.currentTarget.getAttribute('data-id');
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', _dragId);
+  $track.classList.add('track-drag-active');
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  if (!_dragId) return;
+
+  var targetEl = e.currentTarget;
+  var targetId = targetEl.getAttribute('data-id');
+  if (!targetId || targetId === _dragId) return;
+
+  // Determine insertion: left or right half of target
+  var rect = targetEl.getBoundingClientRect();
+  var mid  = rect.left + rect.width / 2;
+  var targetIdx = parseInt(targetEl.getAttribute('data-idx'), 10);
+  _dropTargetIdx = e.clientX < mid ? targetIdx : targetIdx + 1;
+
+  showDropIndicator(_dropTargetIdx);
+}
+
+function onDragLeave(e) {
+  // Only hide if leaving the track entirely
+}
+
+function onDrop(e) {
+  e.preventDefault();
+  $track.classList.remove('track-drag-active');
+  hideDropIndicator();
+
+  if (!_dragId) return;
+  var targetId = e.currentTarget.getAttribute('data-id');
+  if (!targetId || targetId === _dragId) { _dragId = null; return; }
+
+  var fromIdx = S.clips.findIndex(function(c){ return c.id === _dragId; });
+  var toIdx   = _dropTargetIdx !== null ? _dropTargetIdx : parseInt(e.currentTarget.getAttribute('data-idx'), 10);
+  _dragId = null;
+  _dropTargetIdx = null;
+
+  if (fromIdx < 0 || toIdx < 0 || toIdx > S.clips.length) return;
+  var moved = S.clips.splice(fromIdx, 1)[0];
+  // Adjust insertion index after removal
+  if (toIdx > fromIdx) toIdx--;
+  S.clips.splice(toIdx, 0, moved);
+  S.selected = moved.id;
+
+  renderTrack();
+  emitEvent('reorder', null, null);
+}
+
+function onDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  $track.classList.remove('track-drag-active');
+  _dragId = null;
+  _dropTargetIdx = null;
+  hideDropIndicator();
+  // Clean up all drag-over states
+  $track.querySelectorAll('.clip').forEach(function(el){ el.classList.remove('drag-over'); });
+}
+
+// Track-level dragover (catch drops in the gap)
+$track.addEventListener('dragover', function(e) {
+  if (!_dragId) return;
+  e.preventDefault();
+  // Find insertion index based on mouse X position
+  var mouseX = e.clientX - $trackWrap.getBoundingClientRect().left + $trackWrap.scrollLeft;
+  var clips = $track.querySelectorAll('.clip');
+  var insertIdx = clips.length; // default: append
+  for (var i = 0; i < clips.length; i++) {
+    var rect = clips[i].getBoundingClientRect();
+    var clipLeft = rect.left - $trackWrap.getBoundingClientRect().left + $trackWrap.scrollLeft;
+    var clipMid = clipLeft + rect.width / 2;
+    if (mouseX < clipMid) { insertIdx = i; break; }
+  }
+  _dropTargetIdx = insertIdx;
+  showDropIndicator(insertIdx);
+});
+$track.addEventListener('dragleave', function(e) {
+  if (!$track.contains(e.relatedTarget)) {
+    hideDropIndicator();
+    _dropTargetIdx = null;
+  }
+});
+$track.addEventListener('drop', function(e) {
+  e.preventDefault();
+  $track.classList.remove('track-drag-active');
+  hideDropIndicator();
+  if (!_dragId || _dropTargetIdx === null) { _dragId = null; return; }
+  var fromIdx = S.clips.findIndex(function(c){ return c.id === _dragId; });
+  var toIdx = _dropTargetIdx;
+  _dragId = null;
+  _dropTargetIdx = null;
+  if (fromIdx < 0) return;
+  var moved = S.clips.splice(fromIdx, 1)[0];
+  if (toIdx > fromIdx) toIdx--;
+  S.clips.splice(Math.max(0, toIdx), 0, moved);
+  S.selected = moved.id;
+  renderTrack();
+  emitEvent('reorder', null, null);
+});
+
+function showDropIndicator(insertIdx) {
+  var clips = $track.querySelectorAll('.clip');
+  var wrapRect = $trackWrap.getBoundingClientRect();
+  var x;
+  if (clips.length === 0) {
+    x = TRACK_PAD;
+  } else if (insertIdx <= 0) {
+    var r = clips[0].getBoundingClientRect();
+    x = r.left - wrapRect.left + $trackWrap.scrollLeft - 3;
+  } else if (insertIdx >= clips.length) {
+    var last = clips[clips.length - 1];
+    var r = last.getBoundingClientRect();
+    x = r.right - wrapRect.left + $trackWrap.scrollLeft + 2;
+  } else {
+    var r1 = clips[insertIdx - 1].getBoundingClientRect();
+    var r2 = clips[insertIdx].getBoundingClientRect();
+    x = (r1.right + r2.left) / 2 - wrapRect.left + $trackWrap.scrollLeft;
+  }
+  $dropInd.style.left = Math.round(x) + 'px';
+  $dropInd.style.display = 'block';
+}
+function hideDropIndicator() {
+  $dropInd.style.display = 'none';
+}
+
+// ── Trim handle drag ──────────────────────────────────────────
+var _trim = null;
+
+function onTrimDown(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  var id   = e.currentTarget.getAttribute('data-id');
+  var side = e.currentTarget.getAttribute('data-side');
+  var clip = S.clips.find(function(c){ return c.id === id; });
+  if (!clip) return;
+
+  e.currentTarget.classList.add('active');
+  _trim = {
+    clipId:    id,
+    side:      side,
+    startX:    e.clientX,
+    origStart: clip.trim_start,
+    origEnd:   clip.trim_end,
+    clipDur:   clip.duration,
+    pps:       pixPerSec(),
+  };
+  S.selected = id;
+  document.addEventListener('pointermove', onTrimMove, {passive: false});
+  document.addEventListener('pointerup',   onTrimUp);
+  renderTrack();
+}
+
+function onTrimMove(e) {
+  if (!_trim) return;
+  var clip = S.clips.find(function(c){ return c.id === _trim.clipId; });
+  if (!clip) return;
+
+  var dx    = e.clientX - _trim.startX;
+  var dSec  = dx / _trim.pps;
+  var snapped;
+
+  if (_trim.side === 'left') {
+    var raw = Math.max(0, _trim.origStart + dSec);
+    var maxS = _trim.origEnd > 0 ? _trim.origEnd - MIN_DUR :
+               (_trim.clipDur > 0 ? _trim.clipDur - MIN_DUR : 9999);
+    snapped = snapTime(Math.min(raw, maxS), _trim.clipId);
+    clip.trim_start = snapped.t;
+  } else {
+    var raw = _trim.origEnd + dSec;
+    if (raw < clip.trim_start + MIN_DUR) raw = clip.trim_start + MIN_DUR;
+    if (_trim.clipDur > 0 && raw > _trim.clipDur) raw = _trim.clipDur;
+    if (raw < 0) raw = 0;
+    snapped = snapTime(raw, _trim.clipId);
+    clip.trim_end = snapped.t <= clip.trim_start + MIN_DUR
+      ? clip.trim_start + MIN_DUR : snapped.t;
+  }
+
+  if (snapped.snapped && snapped.snapX !== null) {
+    showSnapGuide(snapped.snapX);
+  } else {
+    hideSnapGuide();
+  }
+
+  // Live tooltip
+  var eff = clipEffDur(clip);
+  $trimTooltip.style.display = 'block';
+  $trimTooltip.style.left    = (e.clientX + 12) + 'px';
+  $trimTooltip.style.top     = (e.clientY - 8)  + 'px';
+  $trimTooltip.textContent   = (
+    _trim.side === 'left'
+    ? 'In: ' + fmt(clip.trim_start)
+    : 'Out: ' + (clip.trim_end > 0 ? fmt(clip.trim_end) : 'end')
+  ) + ' (' + (eff > 0 ? eff.toFixed(2)+'s' : 'full') + ')';
+
+  S.total_dur = totalDur();
+  renderTrack();
+}
+
+function onTrimUp() {
+  if (!_trim) return;
+  document.removeEventListener('pointermove', onTrimMove);
+  document.removeEventListener('pointerup',   onTrimUp);
+  $trimTooltip.style.display = 'none';
+  hideSnapGuide();
+  $track.querySelectorAll('.trim-l.active,.trim-r.active').forEach(function(el){
+    el.classList.remove('active');
+  });
+
+  var clip = S.clips.find(function(c){ return c.id === _trim.clipId; });
+  var side = _trim.side;
+  _trim = null;
+  S.total_dur = totalDur();
+  renderTrack();
+  if (clip) {
+    emitEvent('trim', clip.id, {trim_start: clip.trim_start, trim_end: clip.trim_end, side: side});
+  }
+}
+
+// ── Playhead scrub — client-side smooth drag ──────────────────
+// Python is only notified on pointerup (no per-move reruns)
+var _phDrag = false;
+
+function seekToTime(t) {
+  var td = S.total_dur;
+  S.playhead = Math.max(0, Math.min(td > 0 ? td : 9999, t));
+  updatePlayheadDisplay();
+}
+
+$ruler.addEventListener('pointerdown', function(e) {
+  if (e.target.classList.contains('tick')) return;
+  _phDrag = true;
+  $ruler.setPointerCapture(e.pointerId);
+  seekToTime(rulerMouseXToTime(e.clientX));
+  document.addEventListener('pointermove', onPhMove);
+  document.addEventListener('pointerup',   onPhUp);
+  e.preventDefault();
+});
+
+// Click on track (not on a clip) to seek
+$track.addEventListener('click', function(e) {
+  if (e.target !== $track && !e.target.classList.contains('clip-gap')) return;
+  var t = mouseXToTime(e.clientX);
+  seekToTime(t);
+  emitEvent('playhead', null, S.playhead);
+});
+
+function onPhMove(e) {
+  if (!_phDrag) return;
+  seekToTime(rulerMouseXToTime(e.clientX));
+}
+function onPhUp(e) {
+  if (!_phDrag) return;
+  _phDrag = false;
+  document.removeEventListener('pointermove', onPhMove);
+  document.removeEventListener('pointerup',   onPhUp);
+  // Only notify Python on release (avoids excessive reruns during drag)
+  emitEvent('playhead', null, S.playhead);
+}
+
+// ── Toolbar handlers ──────────────────────────────────────────
+document.getElementById('btn-move-left').addEventListener('click', function() {
+  var idx = S.clips.findIndex(function(c){ return c.id === S.selected; });
+  if (idx <= 0) return;
+  var t = S.clips[idx-1]; S.clips[idx-1] = S.clips[idx]; S.clips[idx] = t;
+  renderTrack(); emitEvent('reorder', null, null);
+});
+document.getElementById('btn-move-right').addEventListener('click', function() {
+  var idx = S.clips.findIndex(function(c){ return c.id === S.selected; });
+  if (idx < 0 || idx >= S.clips.length-1) return;
+  var t = S.clips[idx+1]; S.clips[idx+1] = S.clips[idx]; S.clips[idx] = t;
+  renderTrack(); emitEvent('reorder', null, null);
+});
+document.getElementById('btn-dup').addEventListener('click', function() {
+  var idx = S.clips.findIndex(function(c){ return c.id === S.selected; });
+  if (idx < 0 || S.clips.length >= 12) return;
+  var orig = S.clips[idx];
+  var copy = JSON.parse(JSON.stringify(orig));
+  copy.id    = orig.id + '__dup__' + Date.now();
+  copy.label = orig.label + ' (copy)';
+  S.clips.splice(idx+1, 0, copy);
+  S.selected = copy.id;
+  S.total_dur = totalDur();
+  renderTrack();
+  emitEvent('duplicate', orig.id, copy.id);
+});
+document.getElementById('btn-delete').addEventListener('click', function() {
+  var idx = S.clips.findIndex(function(c){ return c.id === S.selected; });
+  if (idx < 0 || S.clips.length <= 1) return;
+  var removedId = S.clips[idx].id;
+  S.clips.splice(idx, 1);
+  S.selected = S.clips[Math.min(idx, S.clips.length-1)].id;
+  S.total_dur = totalDur();
+  renderTrack();
+  emitEvent('delete', removedId, null);
+});
+document.getElementById('btn-split').addEventListener('click', function() {
+  var idx = S.clips.findIndex(function(c){ return c.id === S.selected; });
+  if (idx < 0) return;
+  var starts = clipStartTimes();
+  var splitInClip = S.playhead - starts[idx];
+  var eff = clipEffDur(S.clips[idx]);
+  if (splitInClip < MIN_DUR || splitInClip > eff - MIN_DUR) {
+    $status.textContent = 'Move playhead inside clip to split';
+    return;
+  }
+  emitEvent('split', S.selected, splitInClip);
+});
+document.getElementById('btn-reset').addEventListener('click', function() {
+  emitEvent('reset', null, null);
+});
+document.getElementById('btn-snap').addEventListener('click', function() {
+  S.snap_on = !S.snap_on;
+  updateToolbar();
+  emitEvent('snap_toggle', null, S.snap_on);
+});
+document.getElementById('btn-zoom-in').addEventListener('click', function() {
+  S.zoom = Math.min(ZOOM_MAX, parseFloat((S.zoom + 0.5).toFixed(1)));
+  S.total_dur = totalDur();
+  renderTrack();
+  emitEvent('zoom', null, S.zoom);
+});
+document.getElementById('btn-zoom-out').addEventListener('click', function() {
+  S.zoom = Math.max(ZOOM_MIN, parseFloat((S.zoom - 0.5).toFixed(1)));
+  S.total_dur = totalDur();
+  renderTrack();
+  emitEvent('zoom', null, S.zoom);
+});
+document.getElementById('btn-fit').addEventListener('click', function() {
+  S.zoom = 1.0;
+  S.total_dur = totalDur();
+  renderTrack();
+  emitEvent('zoom', null, S.zoom);
+});
+
+// ── Keyboard shortcuts ────────────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  var tag = document.activeElement && document.activeElement.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+  switch (e.key) {
+    case 'ArrowLeft':  document.getElementById('btn-move-left').click();  e.preventDefault(); break;
+    case 'ArrowRight': document.getElementById('btn-move-right').click(); e.preventDefault(); break;
+    case 'Delete':
+    case 'Backspace':  document.getElementById('btn-delete').click(); e.preventDefault(); break;
+    case 'd': case 'D': document.getElementById('btn-dup').click(); break;
+    case 's': case 'S': document.getElementById('btn-split').click(); break;
+    case ',':  seekToTime(Math.max(0, S.playhead - 0.5)); emitEvent('playhead', null, S.playhead); break;
+    case '.':  seekToTime(S.playhead + 0.5); emitEvent('playhead', null, S.playhead); break;
+    case '[':  seekToTime(0); emitEvent('playhead', null, S.playhead); break;
+    case ']':  seekToTime(S.total_dur); emitEvent('playhead', null, S.playhead); break;
+  }
+});
+
+// ── Emit event ────────────────────────────────────────────────
+function emitEvent(type, id, value) {
+  var order = S.clips.map(function(c){ return c.id; });
+  var trims  = {};
+  S.clips.forEach(function(c){
+    trims[c.id] = {start: c.trim_start, end: c.trim_end};
+  });
+  sendValue({
+    event:    type,
+    clip_id:  id,
+    value:    value,
+    order:    order,
+    trims:    trims,
+    selected: S.selected,
+    playhead: S.playhead,
+    zoom:     S.zoom,
+    snap_on:  S.snap_on,
+  });
+}
+
+// ── Receive state from Python ─────────────────────────────────
+var _firstRender = true;
+window.addEventListener('message', function(e) {
+  if (!e.data || e.data.type !== 'streamlit:render') return;
+  _stopRetrying();
+
+  var args  = e.data.args || {};
+  var clips = args.clips  || [];
+  document.documentElement.dataset.theme = args.theme === 'light' ? 'light' : 'dark';
+
+  S.clips = clips.map(function(c) {
+    // Preserve local trim edits during an active trim drag
+    var ex = S.clips.find(function(x){ return x.id === c.id; });
+    if (_trim && _trim.clipId === c.id && ex) return ex;
+    return {
+      id:             c.id,
+      label:          c.label         || c.id,
+      role:           c.role          || '',
+      duration:       c.duration      || 0,
+      trim_start:     c.trim_start    || 0,
+      trim_end:       c.trim_end      || 0,
+      thumbnail_b64:  c.thumbnail_b64 || null,
+      has_audio:      !!c.has_audio,
+      waveform_peaks: c.waveform_peaks || null,
+      transition:     c.transition    || null,
+    };
+  });
+
+  if (args.selected !== undefined && args.selected !== null) S.selected = args.selected;
+  if (args.playhead !== undefined) S.playhead = args.playhead;
+  if (args.zoom     !== undefined) S.zoom     = args.zoom;
+  if (args.snap_on  !== undefined) S.snap_on  = !!args.snap_on;
+  S.total_dur = totalDur();
+  renderTrack();
+
+  if (_firstRender) {
+    _firstRender = false;
+    emitEvent('ready', null, null);
+  }
+
+  var h = document.getElementById('app').scrollHeight + 16;
+  setFrameHeight(h);
+});
+
+// ── Boot sequence ─────────────────────────────────────────────
+var _readySent   = false;
+var _readyRetries = 0;
+var _maxRetries  = 40;
+var _retryTimer  = null;
+
+function _sendReady() {
+  if (_readySent) return;
+  _readyRetries++;
+  window.parent.postMessage({
+    isStreamlitMessage: true, type: 'streamlit:componentReady', apiVersion: 1
+  }, '*');
+  if (_readyRetries < _maxRetries) _retryTimer = setTimeout(_sendReady, 250);
+}
+
+_stopRetrying = function() {
+  _readySent = true;
+  if (_retryTimer) { clearTimeout(_retryTimer); _retryTimer = null; }
+};
+
+window.addEventListener('message', function _bootL(e) {
+  if (e.data && e.data.type === 'streamlit:render') {
+    _stopRetrying();
+    window.removeEventListener('message', _bootL);
+  }
+});
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(_sendReady, 50); });
+} else {
+  setTimeout(_sendReady, 50);
+}
+</script>
+</body>
+</html>

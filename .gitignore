@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+outputs/*
+uploads/*
+temp/*
+temp_inputs/*
+projects/*
+publishing_state/
+!outputs/.gitkeep
+!uploads/.gitkeep

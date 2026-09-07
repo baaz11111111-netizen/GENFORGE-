@@ -1,0 +1,38 @@
+# Keep the image lean and secret-free. Never ship:
+# - secrets / local env files
+# - the local virtualenv or interpreter caches
+# - user data (mounted as volumes at runtime instead)
+# - VCS metadata and IDE/tool caches
+
+# Secrets & environment
+.env
+.env.*
+!.env.example
+publishing_state/
+
+# Virtualenvs & Python caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Runtime data (persisted via Docker volumes, never baked into the image)
+projects/
+uploads/
+outputs/
+temp/
+temp_inputs/
+
+# VCS / IDE / OS noise
+.git/
+.gitignore
+.qoder/
+.vscode/
+.idea/
+*.log
+
+# Local deployment state
+docker-compose.override.yml
